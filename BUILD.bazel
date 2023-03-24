@@ -1,0 +1,31 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_setting")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load(":defs.bzl", "is_bzlmod_enabled")
+
+string_setting(
+    name = "mode",
+    build_setting_default = "bzlmod" if is_bzlmod_enabled() else "workspace",
+)
+
+config_setting(
+    name = "bzlmod",
+    flag_values = {
+        ":mode": "bzlmod",
+    }
+)
+
+config_setting(
+    name = "workspace",
+    flag_values = {
+        ":mode": "workspace",
+    }
+)
+
+write_file(
+    name = "demo",
+    out = "demo.txt",
+    content = select({
+        ":bzlmod": ["bzlmod"],
+        ":workspace": ["workspace"],
+    }),
+)
